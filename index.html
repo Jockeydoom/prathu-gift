@@ -84,11 +84,13 @@
 
     video#giftVideo {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 300px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.4);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 700px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(255,255,255,0.3);
       z-index: 3;
     }
 
@@ -120,7 +122,7 @@
     </div>
   </div>
 
-  <video id="giftVideo" class="hidden" autoplay muted controls playsinline>
+  <video id="giftVideo" class="hidden" autoplay muted loop playsinline>
     <source src="Surprise Gift.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
@@ -142,7 +144,7 @@
     ];
 
     let currentImg = 0;
-    const unlockTime = new Date("2025-08-03T12:30:00Z"); // Aug 3, 4:30 PM UAE (UTC+4 = UTC+4:00)
+    const unlockTime = new Date("2025-08-03T12:30:00Z"); // 4:30 PM UAE time (UTC+4)
 
     function updateLockCountdown() {
       const now = new Date();
@@ -190,7 +192,7 @@
         backgroundSlideshow.style.backgroundImage = `url(${imageUrls[currentImg]})`;
       }, 3000);
 
-      // Show video
+      // Show video in center
       giftVideo.classList.remove('hidden');
       giftVideo.play();
     }
