@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gift for Prathu 🎁</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .hidden { display: none; }
+    .birthday-message {
+      font-size: 3rem;
+      font-weight: bold;
+      color: #ffeb3b;
+      animation: fadeInZoom 1s ease-in-out forwards;
+    }
+    .status-message {
+      font-size: 1.8rem;
+      margin-top: 1rem;
+      color: #ffeb3b;
+    }
+    .reveal-btn {
+      margin-top: 1.5rem;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      background: #651fff;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 0 10px #7c4dff;
+      transition: transform 0.3s ease;
+    }
+    .reveal-btn:hover { transform: scale(1.05); }
+    .gift-container {
+      margin-top: 2rem;
+      width: 100%;
+      max-width: 500px;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+    .gift-container.revealed {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .description {
+      margin-bottom: 1.5rem;
+      background: rgba(255,255,255,0.1);
+      padding: 1rem;
+      border-radius: 10px;
+    }
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: 300px;
+    }
+    .slideshow img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(255,255,255,0.3);
+      display: none;
+    }
+    .slideshow img.active { display: block; }
+
+    @keyframes fadeInZoom {
+      0% { opacity: 0; transform: scale(0.5); }
+      100% { opacity: 1; transform: scale(1.1); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="lockMsg" class="status-message"></div>
+  <button id="revealBtn" class="reveal-btn hidden">Reveal Gift</button>
+  <div id="birthdayMessage" class="birthday-message hidden">🎉 Happy Birthday Prathu! 🎉</div>
+  <div id="countdown" class="status-message hidden"></div>
+
+  <div id="giftContainer" class="gift-container hidden">
+    <div class="description">
+      <h2>Honor 200 Pro 5G – Moonlight White</h2>
+      <p>
+        • 6.78″ OLED, 120 Hz, 4000 nits peak brightness<br>
+        • Snapdragon 8s Gen 3 & Adreno 735 GPU<br>
+        • Up to 12 GB RAM & 512 GB storage<br>
+        • Triple 50 MP portrait cameras<br>
+        • 5200 mAh battery with fast‑charging
+      </p>
+    </div>
+    <div class="slideshow" id="slideshow">
+      <img class="active" src="https://fdn.gsmarena.com/imgroot/reviews/24/honor-200-pro/lifestyle/-1024w2/gsmarena_013.jpg" alt="Honor 200 Pro image 1" />
+      <img src="https://fdn.gsmarena.com/imgroot/reviews/24/honor-200-pro/lifestyle/-1024w2/gsmarena_002.jpg" alt="Honor 200 Pro image 2" />
+      <img src="https://fdn.gsmarena.com/imgroot/reviews/24/honor-200-pro/lifestyle/-1024w2/gsmarena_024.jpg" alt="Honor 200 Pro image 3" />
+      <img src="https://fdn.gsmarena.com/imgroot/reviews/24/honor-200-pro/lifestyle/-1024w2/gsmarena_014.jpg" alt="Honor 200 Pro image 4" />
+    </div>
+  </div>
+
+  <script>
+    const lockMsg = document.getElementById('lockMsg');
+    const countdown = document.getElementById('countdown');
+    const birthdayMessage = document.getElementById('birthdayMessage');
+    const revealBtn = document.getElementById('revealBtn');
+    const giftContainer = document.getElementById('giftContainer');
+    const images = document.querySelectorAll('#slideshow img');
+    let slide = 0;
+
+    const unlockTime = new Date("2025-08-30T14:30:00Z"); // 8:00 PM IST (UTC+5:30)
+
+    function updateLockCountdown() {
+      const now = new Date();
+      const diff = unlockTime - now;
+      if (diff > 0) {
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const m = Math.floor((diff / (1000 * 60)) % 60);
+        const s = Math.floor((diff / 1000) % 60);
+        lockMsg.textContent = `Gift unlocks in ${d}d ${h}h ${m}m ${s}s...`;
+        setTimeout(updateLockCountdown, 1000);
+      } else {
+        lockMsg.classList.add('hidden');
+        revealBtn.classList.remove('hidden');
+      }
+    }
+
+    function showBirthdayCountdown() {
+      revealBtn.classList.add('hidden');
+      birthdayMessage.classList.remove('hidden');
+      let timeLeft = 10;
+      countdown.textContent = `Opening in ${timeLeft}...`;
+      countdown.classList.remove('hidden');
+
+      const timer = setInterval(() => {
+        timeLeft--;
+        countdown.textContent = `Opening in ${timeLeft}...`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          birthdayMessage.classList.add('hidden');
+          countdown.classList.add('hidden');
+          revealGift();
+        }
+      }, 1000);
+    }
+
+    function revealGift() {
+      giftContainer.classList.remove('hidden');
+      giftContainer.classList.add('revealed');
+      setInterval(() => {
+        images[slide].classList.remove('active');
+        slide = (slide + 1) % images.length;
+        images[slide].classList.add('active');
+      }, 3000);
+    }
+
+    revealBtn.addEventListener('click', showBirthdayCountdown);
+    updateLockCountdown();
+  </script>
+
+</body>
+</html>
