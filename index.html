@@ -1,53 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gift Game for Prathu 🎮</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Memory Game 🎉</title>
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-      color: white;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      color: #fff;
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
-      text-align: center;
+      align-items: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      overflow: hidden;
+      text-align: center;
+      padding: 20px;
     }
-    h1 { color: #ffeb3b; }
-    .game-area {
-      position: relative;
-      width: 100%;
-      max-width: 600px;
-      height: 400px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 15px;
-      overflow: hidden;
+    h1 { margin: 10px 0; }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      grid-gap: 15px;
       margin-top: 20px;
     }
-    .basket {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
+    .card {
       width: 80px;
-      height: 40px;
-      background: #ff4081;
-      border-radius: 10px;
-    }
-    .heart {
-      position: absolute;
-      top: -40px;
+      height: 80px;
+      background: #ffffff33;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 2rem;
-      animation: fall linear forwards;
+      cursor: pointer;
+      transform: scale(1);
+      transition: transform 0.3s;
+      position: relative;
     }
-    @keyframes fall {
-      from { top: -40px; }
-      to { top: 400px; }
+    .card:hover { transform: scale(1.1); }
+    .card.flipped {
+      background: #fff;
+      color: #333;
+      cursor: default;
     }
     .hidden { display: none; }
 
@@ -82,11 +78,10 @@
 </head>
 <body>
 
-  <h1>🎮 Catch the Hearts to Unlock Your Gift 🎁</h1>
-  <p id="scoreText">Score: 0 / 10</p>
-  <div class="game-area" id="gameArea">
-    <div class="basket" id="basket"></div>
-  </div>
+  <h1>💖 Memory Flip Game 💖</h1>
+  <p>Match all pairs to unlock your surprise 🎁</p>
+
+  <div id="game-board"></div>
 
   <div id="giftContainer" class="gift-container hidden">
     <h2>🎉 Happy Birthday My Dear Prathu 🎉</h2>
@@ -97,72 +92,71 @@
   </div>
 
   <script>
-    const basket = document.getElementById('basket');
-    const gameArea = document.getElementById('gameArea');
-    const scoreText = document.getElementById('scoreText');
-    const giftContainer = document.getElementById('giftContainer');
-    const images = document.querySelectorAll('#slideshow img');
-    let slide = 0;
-    let score = 0;
-    const targetScore = 10;
+    const emojis = ["🎂","🎂","🎁","🎁","🎉","🎉","💖","💖",
+                    "🌹","🌹","🍫","🍫","✨","✨","😍","😍"];
 
-    // Basket movement
-    let basketX = gameArea.offsetWidth / 2 - 40;
-    document.addEventListener('keydown', e => {
-      if (e.key === "ArrowLeft") basketX -= 20;
-      if (e.key === "ArrowRight") basketX += 20;
-      basketX = Math.max(0, Math.min(gameArea.offsetWidth - basket.offsetWidth, basketX));
-      basket.style.left = basketX + "px";
+    // Shuffle cards
+    let shuffled = emojis.sort(() => 0.5 - Math.random());
+    const board = document.getElementById('game-board');
+
+    shuffled.forEach((emoji, index) => {
+      const card = document.createElement('div');
+      card.classList.add('card');
+      card.dataset.emoji = emoji;
+      card.dataset.index = index;
+      card.textContent = "";
+      board.appendChild(card);
     });
 
-    // Drop hearts
-    function createHeart() {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.textContent = "❤️";
-      heart.style.left = Math.random() * (gameArea.offsetWidth - 30) + "px";
-      heart.style.animationDuration = (2 + Math.random() * 3) + "s";
+    let firstCard = null;
+    let lockBoard = false;
+    let matches = 0;
+    const totalPairs = emojis.length / 2;
 
-      gameArea.appendChild(heart);
+    function flipCard(card) {
+      if (lockBoard || card.classList.contains('flipped')) return;
 
-      const fallInterval = setInterval(() => {
-        const heartRect = heart.getBoundingClientRect();
-        const basketRect = basket.getBoundingClientRect();
+      card.classList.add('flipped');
+      card.textContent = card.dataset.emoji;
 
-        if (
-          heartRect.bottom >= basketRect.top &&
-          heartRect.left < basketRect.right &&
-          heartRect.right > basketRect.left
-        ) {
-          score++;
-          scoreText.textContent = `Score: ${score} / ${targetScore}`;
-          heart.remove();
-          clearInterval(fallInterval);
-          if (score >= targetScore) unlockGift();
+      if (!firstCard) {
+        firstCard = card;
+      } else {
+        if (firstCard.dataset.emoji === card.dataset.emoji) {
+          firstCard = null;
+          matches++;
+          if (matches === totalPairs) unlockGift();
+        } else {
+          lockBoard = true;
+          setTimeout(() => {
+            card.classList.remove('flipped');
+            card.textContent = "";
+            firstCard.classList.remove('flipped');
+            firstCard.textContent = "";
+            firstCard = null;
+            lockBoard = false;
+          }, 1000);
         }
-        if (heartRect.top > window.innerHeight) {
-          heart.remove();
-          clearInterval(fallInterval);
-        }
-      }, 50);
-
-      setTimeout(() => heart.remove(), 5000);
+      }
     }
 
-    function unlockGift() {
-      gameArea.classList.add('hidden');
-      scoreText.classList.add('hidden');
-      giftContainer.classList.remove('hidden');
-      giftContainer.classList.add('revealed');
+    board.addEventListener('click', e => {
+      if (e.target.classList.contains('card')) flipCard(e.target);
+    });
 
+    // Unlock gift
+    function unlockGift() {
+      document.getElementById('giftContainer').classList.remove('hidden');
+      document.getElementById('giftContainer').classList.add('revealed');
+
+      const images = document.querySelectorAll('#slideshow img');
+      let slide = 0;
       setInterval(() => {
         images[slide].classList.remove('active');
         slide = (slide + 1) % images.length;
         images[slide].classList.add('active');
       }, 3000);
     }
-
-    setInterval(createHeart, 1000);
   </script>
 </body>
 </html>
