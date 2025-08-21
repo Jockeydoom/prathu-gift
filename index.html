@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gift for Prathu 🎁</title>
+  <title>Gift Game for Prathu 🎮</title>
   <style>
     body {
       margin: 0;
@@ -16,36 +16,44 @@
       flex-direction: column;
       text-align: center;
       min-height: 100vh;
-      padding: 20px;
+      overflow: hidden;
+    }
+    h1 { color: #ffeb3b; }
+    .game-area {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      height: 400px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .basket {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 40px;
+      background: #ff4081;
+      border-radius: 10px;
+    }
+    .heart {
+      position: absolute;
+      top: -40px;
+      font-size: 2rem;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      from { top: -40px; }
+      to { top: 400px; }
     }
     .hidden { display: none; }
-    .birthday-message {
-      font-size: 3rem;
-      font-weight: bold;
-      color: #ffeb3b;
-      animation: fadeInZoom 1s ease-in-out forwards;
-    }
-    .status-message {
-      font-size: 1.8rem;
-      margin-top: 1rem;
-      color: #ffeb3b;
-    }
-    .reveal-btn {
-      margin-top: 1.5rem;
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
-      background: #651fff;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 0 10px #7c4dff;
-      transition: transform 0.3s ease;
-    }
-    .reveal-btn:hover { transform: scale(1.05); }
+
+    /* Gift Reveal */
     .gift-container {
       margin-top: 2rem;
-      width: 100%;
       max-width: 500px;
       opacity: 0;
       transform: scale(0.8);
@@ -54,12 +62,6 @@
     .gift-container.revealed {
       opacity: 1;
       transform: scale(1);
-    }
-    .description {
-      margin-bottom: 1.5rem;
-      background: rgba(255,255,255,0.1);
-      padding: 1rem;
-      border-radius: 10px;
     }
     .slideshow {
       position: relative;
@@ -73,86 +75,86 @@
       height: 100%;
       object-fit: contain;
       border-radius: 20px;
-      box-shadow: 0 0 20px rgba(255,255,255,0.3);
       display: none;
     }
     .slideshow img.active { display: block; }
-
-    @keyframes fadeInZoom {
-      0% { opacity: 0; transform: scale(0.5); }
-      100% { opacity: 1; transform: scale(1.1); }
-    }
   </style>
 </head>
 <body>
 
-  <div id="lockMsg" class="status-message"></div>
-  <button id="revealBtn" class="reveal-btn hidden">Reveal Gift</button>
-  <div id="birthdayMessage" class="birthday-message hidden">🎉 Happy Birthday My Dear Prathu! 🎉</div>
-  <div id="countdown" class="status-message hidden"></div>
+  <h1>🎮 Catch the Hearts to Unlock Your Gift 🎁</h1>
+  <p id="scoreText">Score: 0 / 10</p>
+  <div class="game-area" id="gameArea">
+    <div class="basket" id="basket"></div>
+  </div>
 
   <div id="giftContainer" class="gift-container hidden">
-    <div class="description">
-      <h2>Sorry Gift Ella</h2>
-      <p>
-Return adichu, ini nokkanda......
-      </p>
-    </div>
+    <h2>🎉 Happy Birthday My Dear Prathu 🎉</h2>
     <div class="slideshow" id="slideshow">
-      <img class="active" src="https://i.ytimg.com/vi/q0jSLesrvU8/maxresdefault.jpg" alt="Honor 200 Pro image 1" />
-      <img class="active" src="https://i.ytimg.com/vi/7BpfOvkMGIU/maxresdefault.jpg" alt="Honor 200 Pro image 2" />
+      <img class="active" src="https://i.ytimg.com/vi/q0jSLesrvU8/maxresdefault.jpg" />
+      <img src="https://i.ytimg.com/vi/7BpfOvkMGIU/maxresdefault.jpg" />
     </div>
   </div>
 
   <script>
-    const lockMsg = document.getElementById('lockMsg');
-    const countdown = document.getElementById('countdown');
-    const birthdayMessage = document.getElementById('birthdayMessage');
-    const revealBtn = document.getElementById('revealBtn');
+    const basket = document.getElementById('basket');
+    const gameArea = document.getElementById('gameArea');
+    const scoreText = document.getElementById('scoreText');
     const giftContainer = document.getElementById('giftContainer');
     const images = document.querySelectorAll('#slideshow img');
     let slide = 0;
+    let score = 0;
+    const targetScore = 10;
 
-    const unlockTime = new Date("2025-08-06T12:30:00Z"); // 8:00 PM IST (UTC+5:30)
+    // Basket movement
+    let basketX = gameArea.offsetWidth / 2 - 40;
+    document.addEventListener('keydown', e => {
+      if (e.key === "ArrowLeft") basketX -= 20;
+      if (e.key === "ArrowRight") basketX += 20;
+      basketX = Math.max(0, Math.min(gameArea.offsetWidth - basket.offsetWidth, basketX));
+      basket.style.left = basketX + "px";
+    });
 
-    function updateLockCountdown() {
-      const now = new Date();
-      const diff = unlockTime - now;
-      if (diff > 0) {
-        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const m = Math.floor((diff / (1000 * 60)) % 60);
-        const s = Math.floor((diff / 1000) % 60);
-        lockMsg.textContent = `Gift unlocks in ${d}d ${h}h ${m}m ${s}s...`;
-        setTimeout(updateLockCountdown, 1000);
-      } else {
-        lockMsg.classList.add('hidden');
-        revealBtn.classList.remove('hidden');
-      }
-    }
+    // Drop hearts
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent = "❤️";
+      heart.style.left = Math.random() * (gameArea.offsetWidth - 30) + "px";
+      heart.style.animationDuration = (2 + Math.random() * 3) + "s";
 
-    function showBirthdayCountdown() {
-      revealBtn.classList.add('hidden');
-      birthdayMessage.classList.remove('hidden');
-      let timeLeft = 10;
-      countdown.textContent = `Opening in ${timeLeft}...`;
-      countdown.classList.remove('hidden');
+      gameArea.appendChild(heart);
 
-      const timer = setInterval(() => {
-        timeLeft--;
-        countdown.textContent = `Opening in ${timeLeft}...`;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          birthdayMessage.classList.add('hidden');
-          countdown.classList.add('hidden');
-          revealGift();
+      const fallInterval = setInterval(() => {
+        const heartRect = heart.getBoundingClientRect();
+        const basketRect = basket.getBoundingClientRect();
+
+        if (
+          heartRect.bottom >= basketRect.top &&
+          heartRect.left < basketRect.right &&
+          heartRect.right > basketRect.left
+        ) {
+          score++;
+          scoreText.textContent = `Score: ${score} / ${targetScore}`;
+          heart.remove();
+          clearInterval(fallInterval);
+          if (score >= targetScore) unlockGift();
         }
-      }, 1000);
+        if (heartRect.top > window.innerHeight) {
+          heart.remove();
+          clearInterval(fallInterval);
+        }
+      }, 50);
+
+      setTimeout(() => heart.remove(), 5000);
     }
 
-    function revealGift() {
+    function unlockGift() {
+      gameArea.classList.add('hidden');
+      scoreText.classList.add('hidden');
       giftContainer.classList.remove('hidden');
       giftContainer.classList.add('revealed');
+
       setInterval(() => {
         images[slide].classList.remove('active');
         slide = (slide + 1) % images.length;
@@ -160,12 +162,7 @@ Return adichu, ini nokkanda......
       }, 3000);
     }
 
-    revealBtn.addEventListener('click', showBirthdayCountdown);
-    updateLockCountdown();
+    setInterval(createHeart, 1000);
   </script>
-
 </body>
 </html>
-
-
-
